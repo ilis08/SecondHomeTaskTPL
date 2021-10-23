@@ -23,7 +23,7 @@ namespace SecondHomeTaskTPL
 
             for (int i = 0; i < 100; i++)
             {
-                buyers.Add(new Thread(() => { store.BuyProduct(r.Next(1, 6), r.Next(1, 21)); }));
+                buyers.Add(new Thread(() => {store.BuyProduct(r.Next(1, 6), r.Next(1, 21)); }));
                 buyers[i].Start();
             }
 
@@ -38,6 +38,8 @@ namespace SecondHomeTaskTPL
             }
 
             store.GetProductsStates();
+
+            store.Statistic();
         }
     }
 }

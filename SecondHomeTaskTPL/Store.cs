@@ -17,55 +17,61 @@ namespace SecondHomeTaskTPL
             new Product(5, "Washer", 1300, 100)
         };
 
+        private int SoldItems { get; set; }
+        private int SupplyItems { get; set; }
+
         private object lockerForAdd = new();
         private object lockerForBuy = new();
 
-        public void AddProducts(int id, int count)
-        {
-            
+        public void AddProducts(int countOfProducts, int countOfCertainProduct)
+        {            
             lock (lockerForAdd)
             {
-                Console.WriteLine("-----------AddProduct----------");
-
-                var prod = Products.Where(c => c.Id == id).FirstOrDefault();
-
-                Console.WriteLine($"Supplier add a {count} to {prod.Name}");
-
-                foreach (var product in Products.Where(c => c.Id == id))
+                for (int i = 0; i < countOfProducts; i++)
                 {
-                    product.Count += count;
-                }
+                    Random r = new();
 
-                Console.WriteLine("-------------------------------");
+                    int id = r.Next(1, 6);
+
+                    var prod = Products.Where(c => c.Id == id).FirstOrDefault();
+                  
+                    foreach (var product in Products.Where(c => c.Id == prod.Id))
+                    {
+                        product.Count += countOfCertainProduct;
+                    }
+
+                    Console.WriteLine($"Supplier add a {countOfCertainProduct} to {prod.Name}");
+                    SupplyItems += countOfCertainProduct;
+                }
             }
         }
 
-        public bool BuyProduct(int id, int count)
+        public void BuyProduct(int countOfProducts, int countOfCertainProduct)
         {
-            lock (lockerForAdd)
+            lock (lockerForBuy)
             {
-                Console.WriteLine("----------BuyProduct-----------");
-
-                var product = Products.Find(c => c.Id == id);
-
-                if (product.Count >= count)
+                for (int i = 0; i < countOfProducts; i++)
                 {
-                    foreach (var item in Products.Where(c => c.Id == id))
+                    Random r = new Random();
+
+                    int id = r.Next(1, 6);
+
+                    var product = Products.Where(c => c.Id == id).FirstOrDefault();
+
+                    if (product.Count >= countOfCertainProduct)
                     {
-                        item.Count -= count;
-                        Console.WriteLine($"{count} items of  {product.Name} was bought!");
-                        Console.WriteLine("-------------------------------");
+                        foreach (var item in Products.Where(c => c.Id == product.Id))
+                        {
+                            item.Count -= countOfCertainProduct;
+                            Console.WriteLine($"{countOfCertainProduct} items of {product.Name} was bought!");
+                            SoldItems += countOfCertainProduct;
+                        }
                     }
-                    return true;
+                    else
+                    {
+                        Console.WriteLine($"Product {product.Name} is not available, please try later");
+                    }
                 }
-                else
-                {
-                    Console.WriteLine($"Product {product.Name} is not available, please try later");
-                    Console.WriteLine("-------------------------------");
-                    return false;
-                }
-
-                
             }          
         }
 
@@ -76,6 +82,13 @@ namespace SecondHomeTaskTPL
             {
                 Console.WriteLine($"Product {item.Name} is {item.Count} item available");
             }
+        }
+
+        public void Statistic()
+        {
+            Console.WriteLine("----------------------------");
+            Console.WriteLine($"Supplied items: {SupplyItems}");
+            Console.WriteLine($"Sold items : {SoldItems}");
         }
     }
 }
